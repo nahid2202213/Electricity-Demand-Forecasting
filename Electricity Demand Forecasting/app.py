@@ -1,3 +1,4 @@
+from datetime import datetime
 import streamlit as st
 import pandas as pd
 import joblib
@@ -8,6 +9,9 @@ model = joblib.load("electicity_xgb_prediction_model.pkl")
 st.title("Electricity Demand Forecasting")
 
 hour = st.number_input("Hour", 0, 23, 12)
+# date_str = input("Enter date (dd/mm/yyyy): ")
+# date = datetime.strptime(date_str, "%d/%m/%Y")
+
 dayofweek = st.number_input("Day of Week", 0, 6, 0)
 month = st.number_input("Month", 1, 12, 1)
 year = st.number_input("Year", 2020, 2035, 2026)
