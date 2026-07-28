@@ -4,7 +4,8 @@ import pandas as pd
 import joblib
 
 # Load model
-model = joblib.load("electicity_xgb_prediction_model.pkl")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+model = joblib.load(os.path.join(BASE_DIR, "electicity_xgb_prediction_model.pkl"))
 
 st.title("Electricity Demand Forecasting")
 
