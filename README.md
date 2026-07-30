@@ -2,6 +2,10 @@
 
 A machine learning project that forecasts hourly electricity demand using an **XGBoost** model trained on historical demand, weather, and time-based features. The trained model is deployed as an interactive **Streamlit web app** so users can enter their own inputs and get an instant demand prediction.
 
+## 🚀 Live Demo
+
+Try the app here: **[electricity-demand-forecasting-nahid-hasan.streamlit.app](https://electricity-demand-forecasting-nahid-hasan.streamlit.app/)**
+
 ## 📌 Project Overview
 
 Accurate electricity demand forecasting is critical for utility companies, grid operators, and businesses — it helps manage peak demand, reduce load shedding, and plan better around renewable energy integration.
@@ -9,19 +13,21 @@ Accurate electricity demand forecasting is critical for utility companies, grid 
 This project covers:
 - Analysis of historical hourly electricity demand data (2020–2024)
 - Engineering of time-based and weather-based features (lags, rolling statistics, etc.)
-- Training an **XGBoost Regressor** to predict demand
-- Deploying the trained model in an interactive **Streamlit app**
+- Training and comparing **XGBoost, Random Forest, and Linear Regression** models
+- Hyperparameter tuning, 5-fold time-series cross-validation, and feature importance / residual analysis
+- Deploying the best model in an interactive **Streamlit app** with live weather fetch
 
 ## 🗂️ Repository Structure
 
 ```
 Electricity-Demand-Forecasting/
-├── Electricity Demand Forecasting/
+├── app/
 │   ├── Electricity Demand Dataset.csv              # Historical hourly demand + weather data
 │   ├── ML Project Electricity Demand Forecasting.ipynb   # Full EDA, feature engineering & model training
 │   ├── app.py                                      # Streamlit app for live prediction
 │   ├── electicity_xgb_prediction_model.pkl         # Trained XGBoost model
-│   └── requirements.txt                            # Python dependencies
+│   └── requirements.txt                            # Python dependencies (app-level)
+├── requirements.txt                                # Python dependencies (root-level, used by Streamlit Cloud)
 ├── .devcontainer/                                  # Dev container config
 └── README.md
 ```
@@ -42,18 +48,25 @@ To improve model accuracy, several additional features were created:
 
 ## 🤖 Model
 
-- **Algorithm:** XGBoost Regressor
-- **Validation:** Time Series Split (appropriate cross-validation for time-series data)
+- **Algorithm:** XGBoost Regressor (hyperparameter-tuned)
+- **Validation:** 5-fold Time Series Cross-Validation, plus a held-out chronological test set (2024 onward)
 - **Performance (test set):**
-  - RMSE: **174.82**
-  - MAE: **123.47**
+
+| Model | RMSE | MAE | R² | MAPE |
+|---|---|---|---|---|
+| **XGBoost (tuned)** | **148.19** | **99.74** | **0.989** | **2.10%** |
+| XGBoost (baseline) | 174.83 | 123.32 | 0.985 | 2.58% |
+| Random Forest | 193.94 | 138.44 | 0.981 | 2.88% |
+| Linear Regression | 243.61 | 180.72 | 0.970 | 3.75% |
+
+XGBoost was compared against Random Forest and Linear Regression baselines, then tuned (learning rate, tree depth, subsampling) — reducing RMSE by ~15% over the initial configuration. Feature importance and residual analysis are also included in the notebook.
 
 ## 🚀 Getting Started
 
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/nahid2202213/Electricity-Demand-Forecasting.git
-cd "Electricity-Demand-Forecasting/Electricity Demand Forecasting"
+cd Electricity-Demand-Forecasting/app
 ```
 
 ### 2. Install dependencies
@@ -65,7 +78,7 @@ pip install -r requirements.txt
 ```bash
 streamlit run app.py
 ```
-The app will open in your browser, where you can enter values such as hour, day, month, temperature, and humidity to get an instant electricity demand prediction.
+The app opens with the date and hour pre-filled to the current time (Bangladesh timezone). Enter a city and click **Fetch Live Weather** to auto-fill temperature and humidity (fetched from the free Open-Meteo API — no API key needed), or edit those values manually. Click **Predict Demand** to get an instant forecast. All other model features (day of week, quarter, recent demand trends, etc.) are calculated automatically behind the scenes.
 
 ### 💻 Option: Run Instantly with GitHub Codespaces
 
@@ -80,16 +93,20 @@ No local setup needed — this repo includes a `.devcontainer` config, so you ca
 - streamlit
 - pandas
 - numpy
+- matplotlib
 - xgboost
 - scikit-learn
 - joblib
+- requests
+- tzdata
 
 ## 🔮 Future Improvements
 
-- Compare additional models (Random Forest, LSTM, Prophet, etc.)
-- Deeper hyperparameter tuning
-- Real-time weather API integration
+- Try additional models (LightGBM, LSTM, Prophet)
+- Automated hyperparameter search (GridSearchCV / Optuna) instead of manual configs
+- Use actual weather *forecasts* (not just current conditions) for future-dated predictions
 - Display prediction confidence intervals
+- Fix and re-include the holiday feature (originally computed but dropped) with the correct country's holiday calendar
 
 ## 👤 Author
 
